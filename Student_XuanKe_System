@@ -1,0 +1,268 @@
+package Student_Xuanke;
+
+public class Student {
+	private String id;
+	private String name;
+	
+	public Student(String id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+	
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public String toString(){
+		String msg = "";
+		msg = "学生id = " + this.id + "\t学生name = " + this.name;
+		return msg;
+	}
+}
+========================================================================
+package Student_Xuanke;
+
+public class Subject {
+
+	private String subID;
+	private String subName;
+	private int maxNum;
+	
+	public Subject(String subID, String subName, int maxNum) {
+		super();
+		this.subID = subID;
+		this.subName = subName;
+		this.maxNum = maxNum;
+	}
+	public String getSubID() {
+		return subID;
+	}
+
+	public void setSubID(String subID) {
+		this.subID = subID;
+	}
+
+	public String getSubName() {
+		return subName;
+	}
+
+	public void setSubName(String subName) {
+		this.subName = subName;
+	}
+
+	public int getMaxNum() {
+		return maxNum;
+	}
+
+	public void setMaxNum(int maxNum) {
+		this.maxNum = maxNum;
+	}
+	
+	public String toString() {
+		return "Subject [subID=" + subID + ", subName=" + subName + ", maxNum=" + maxNum + "]";
+	}
+}
+=============================================================================
+package Student_Xuanke;
+
+public class Enrollment { //登记
+	private Student[] list;
+	private Subject subj;
+	private int count;
+	
+	public Enrollment(Subject subj){
+		count = 0;
+		list = new Student[subj.getMaxNum()];
+		this.subj = subj;
+	}
+	public int size(){
+		return count;
+	}
+	public int indexOf(String id){
+		for(int i=0;i<list.length && list[i] != null;i++){
+			if(list[i].getId().equals(id)){
+				return i;
+			}
+		}
+		return -1;
+	}
+	public boolean remove(int index){
+		if(index < 0 || index >= count){
+			return false;
+		}
+		if(index == count - 1){
+			list[index] = null;
+			return true;
+		}
+		for(int i=index;i<list.length && list[i] != null;i++){
+			list[i] = list[i + 1];
+		}
+		list[count - 1] = null;
+		count--;
+		return true;
+	}
+	public boolean add(Student student){
+		if(student == null || count >= list.length){
+			return false;
+		}
+		list[count] = student;
+		count++;
+		return true;
+	}
+	public Student[] getList() {
+		return list;
+	}
+
+	public void setList(Student[] list) {
+		this.list = list;
+	}
+
+	public Subject getSubj() {
+		return subj;
+	}
+
+	public void setSubj(Subject subj) {
+		this.subj = subj;
+	}
+
+	public int getCount() {
+		return count;
+	}
+
+	public void setCount(int count) {
+		this.count = count;
+	}
+	public String toString(){
+		String info = "";
+		for(int i=0;i<list.length && list[i] != null;i++) {
+			info+=list[i].toString();
+		}
+		return info;
+	}
+}
+================================================================
+package Student_Xuanke;
+
+import java.util.Scanner;
+
+public class Driver {
+	private static Enrollment enrollment;
+	
+	public static void main(String args[]){
+		int choice = menu();
+		while(choice != 5){
+			switch(choice){
+			case 1:createSubject();break;
+			case 2:addStudent();break;
+			case 3:exit();break;
+			case 4:print();break;
+			default:System.out.println("输入错误,请重新输入：");
+			}
+			choice = menu();
+		}
+		System.out.println("程序退出，欢迎下次使用！");
+	}
+	
+	public static int menu(){
+		int chioce = 0;
+		System.out.println("======WTU选课系统=======");
+		System.out.println("1.创建课程");
+		System.out.println("2.选课");
+		System.out.println("3.退选");
+		System.out.println("4.打印名单");
+		System.out.println("5.退出");
+		System.out.print("请输入你的选择：");
+		Scanner scan = new Scanner(System.in);
+		chioce = scan.nextInt();
+		
+		return chioce;
+	}
+	
+	public static void createSubject(){
+		Scanner scan = new Scanner(System.in);
+		if(enrollment != null){
+			System.out.println("课程已经创建，是否重新创建？(y/n)");
+			String choice = scan.next();
+			if(choice.equalsIgnoreCase("n"))
+				return;
+			while(choice.equalsIgnoreCase("y")) {
+				System.out.print("输入错误，请重新输入：");
+				choice = scan.next();
+			}
+		}
+		System.out.print("请输入课程id:");
+		String subID = scan.next(); 
+		System.out.print("请输入课程name:");
+		String subName = scan.next();
+		System.out.print("请输入课程人数:");
+		int maxSize = scan.nextInt();
+		while(maxSize <= 0) {
+			System.out.print("输入错误，请重新输入：");
+			maxSize = scan.nextInt();
+		}
+		Subject subj = new Subject(subID,subName,maxSize);
+		enrollment = new Enrollment(subj);
+		System.out.println("课程创建成功！");
+		System.out.println("课程代码：" + subID + ", 课程名称：" + subName +", 课程最大人数：" + maxSize);
+	
+	}
+	public static void addStudent(){
+		if(enrollment == null){
+			System.out.println("课程不存在，请先创建课程！");
+			return;
+		}
+		if(enrollment.getCount() >= enrollment.getSubj().getMaxNum()) {
+			System.out.println("选课学生已满！");
+			return;
+		}
+		Scanner scan = new Scanner(System.in);
+		System.out.print("请输入学生id:");
+		String stuID = scan.next();
+		System.out.print("请输入学生name:");
+		String stuName = scan.next();
+		Student stu = new Student(stuID,stuName);
+		if(enrollment.add(stu)){
+			System.out.println("学生添加成功！");
+		}
+		System.out.println("选课人数"+enrollment.size());
+		System.out.println("当前选课学生：\n" + stu.toString());
+	}
+	public static void exit(){
+		if(enrollment == null){
+			System.out.println("课程不存在，请先创建课程！");
+			return;
+		}
+		System.out.print("请输入需要退选学生的id:");
+		Scanner scan = new Scanner(System.in);
+		String id = scan.next();
+		if(id == null || enrollment.indexOf(id) < 0){
+			System.out.println("该学生不存在！");
+			return;
+		}
+		if(enrollment.remove(enrollment.indexOf(id))){
+			System.out.println("该学生退选成功!");
+		}
+	}
+	public static void print(){
+		if(enrollment == null){
+			System.out.println("课程不存在，请先创建课程！");
+			return;
+		}
+		String info = "";
+		info = "课程代码：" + enrollment.getSubj().getSubID() + "\t课程名称" 
+				 + enrollment.getSubj().getSubName() + "\t课程最大人数：" + enrollment.getSubj().getMaxNum() + "\n";
+		info += enrollment.toString();
+		System.out.println(info);
+	}
+}
